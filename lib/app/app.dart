@@ -15,7 +15,7 @@ class SimatsOneApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: AppConstants.appName,
-      debugShowCheckedModeBanner: AppConfig.isDevelopment,
+      debugShowCheckedModeBanner: false,
       theme: SimatsTheme.light,
       routerConfig: router,
     );

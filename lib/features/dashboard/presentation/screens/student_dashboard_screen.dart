@@ -145,68 +145,77 @@ class _StudentDashboardScreenState
   Widget _buildSyncBar() {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: SimatsSpacing.spaceBase,
+        horizontal: SimatsSpacing.spaceSm,
         vertical: SimatsSpacing.spaceXs,
       ),
       decoration: BoxDecoration(
         color: SimatsColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(9999),
-        border: Border.all(color: SimatsColors.outlineVariant.withOpacity(0.5)),
+        border: Border.all(color: SimatsColors.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: SimatsColors.secondary,
-                  shape: BoxShape.circle,
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: SimatsColors.secondary,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-              const SizedBox(width: SimatsSpacing.spaceXs),
-              Text(
-                'SIMATS-STUDENT-5G',
-                style: SimatsTextStyles.labelSm.copyWith(
-                  color: SimatsColors.onSurface,
-                  fontWeight: FontWeight.w600,
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    'SIMATS-5G',
+                    style: SimatsTextStyles.labelSm.copyWith(
+                      color: SimatsColors.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              const SizedBox(width: SimatsSpacing.spaceXs),
-              Text(
-                '•',
-                style: SimatsTextStyles.labelSm.copyWith(
-                  color: SimatsColors.outline,
+                const SizedBox(width: 6),
+                Text(
+                  '•',
+                  style: SimatsTextStyles.labelSm.copyWith(
+                    color: SimatsColors.outline,
+                  ),
                 ),
-              ),
-              const SizedBox(width: SimatsSpacing.spaceXs),
-              Text(
-                'Synced 10:42 AM',
-                style: SimatsTextStyles.labelSm.copyWith(
-                  color: SimatsColors.onSurfaceVariant,
+                const SizedBox(width: 6),
+                Text(
+                  'Synced 10:42 AM',
+                  style: SimatsTextStyles.labelSm.copyWith(
+                    color: SimatsColors.onSurfaceVariant,
+                    fontSize: 11,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: 6),
           InkWell(
             onTap: _handleRefresh,
             borderRadius: BorderRadius.circular(9999),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   AnimatedRotation(
                     turns: _isRefreshing ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 900),
                     child: const Icon(
                       Icons.sync_rounded,
-                      size: 16,
+                      size: 15,
                       color: SimatsColors.secondary,
                     ),
                   ),
-                  const SizedBox(width: SimatsSpacing.space2xs),
+                  const SizedBox(width: 3),
                   Text(
                     'Refresh',
                     style: SimatsTextStyles.labelSm.copyWith(
