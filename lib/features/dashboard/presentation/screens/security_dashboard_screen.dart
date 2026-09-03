@@ -6,6 +6,7 @@ import '../../../../app/theme/simats_text_styles.dart';
 import '../../../../app/theme/simats_spacing.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../alerts/presentation/providers/alerts_provider.dart';
+import '../../../../shared/models/enums.dart';
 
 class SecurityDashboardScreen extends ConsumerWidget {
   const SecurityDashboardScreen({super.key});
@@ -173,7 +174,7 @@ class SecurityDashboardScreen extends ConsumerWidget {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: a.severity.name == 'critical'
+                            color: a.severity == AlertSeverity.critical
                                 ? SimatsColors.errorContainer
                                 : SimatsColors.surfaceContainerHigh,
                             borderRadius: BorderRadius.circular(9999),
@@ -181,7 +182,7 @@ class SecurityDashboardScreen extends ConsumerWidget {
                           child: Text(
                             a.severity.displayName,
                             style: TextStyle(
-                              color: a.severity.name == 'critical'
+                              color: a.severity == AlertSeverity.critical
                                   ? SimatsColors.error
                                   : SimatsColors.onSurface,
                               fontWeight: FontWeight.w700,
