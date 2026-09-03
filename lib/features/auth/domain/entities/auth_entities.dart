@@ -84,6 +84,7 @@ abstract interface class AuthRepository {
   Future<void> logout();
   Future<AuthSession> refreshSession();
   Future<AuthSession?> getStoredSession();
+  Future<AuthSession> loginWithBiometrics({required UserRole role});
 }
 
 // ── Use Cases ─────────────────────────────────────────────────────────────────

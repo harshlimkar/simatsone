@@ -5,6 +5,7 @@ import '../../domain/entities/auth_entities.dart';
 import '../../data/repositories/mock_auth_repository.dart';
 import '../../../../core/storage/secure_storage_service.dart';
 import '../../../../core/errors/app_failure.dart';
+import '../../../../shared/models/enums.dart';
 
 // ── Repository Provider ───────────────────────────────────────────────────────
 
@@ -68,6 +69,18 @@ class AuthNotifier extends Notifier<AuthState> {
         identifier: identifier,
         password: password,
       );
+      state = AuthAuthenticated(session);
+    } on AppFailure catch (f) {
+      state = AuthError(f);
+    } catch (_) {
+      state = AuthError(const UnknownFailure());
+    }
+  }
+
+  Future<void> loginWithBiometrics(UserRole role) async {
+    state = AuthLoading();
+    try {
+      final session = await _repo.loginWithBiometrics(role: role);
       state = AuthAuthenticated(session);
     } on AppFailure catch (f) {
       state = AuthError(f);

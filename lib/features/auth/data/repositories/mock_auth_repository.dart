@@ -59,6 +59,21 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<AuthSession> loginWithBiometrics({required UserRole role}) async {
+    _logger.d('${AppConstants.tagAuth} [BIOMETRICS] Login as: ${role.name}');
+    final user = _makeUser(role);
+    const tokens = AuthTokens(
+      accessToken: 'demo_biometric_token_simats_one',
+      refreshToken: 'demo_biometric_refresh_token_simats_one',
+    );
+    await _storage.saveAccessToken(tokens.accessToken);
+    await _storage.saveRefreshToken(tokens.refreshToken);
+    await _storage.saveUserId(user.id);
+    await _storage.saveUserRole(user.role.name);
+    return AuthSession(user: user, tokens: tokens, isAuthenticated: true);
+  }
+
+  @override
   Future<void> logout() async {
     _logger.d('${AppConstants.tagAuth} Logout');
     await _storage.clearAll();
