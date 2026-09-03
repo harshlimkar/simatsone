@@ -122,8 +122,8 @@ class MockAuthRepository implements AuthRepository {
       ),
       UserRole.faculty => AppUser(
         id: 'fac_001',
-        name: 'Dr. S. K. Narayanan',
-        email: 'narayanan@simats.edu.in',
+        name: 'Ms. Abisha',
+        email: 'abisha@simats.edu.in',
         role: UserRole.faculty,
         department: 'Computer Science and Engineering',
         profileImageUrl: null,

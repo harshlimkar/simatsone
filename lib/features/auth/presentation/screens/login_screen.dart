@@ -51,7 +51,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           _idCtrl.text = 'student@simats.edu';
           break;
         case UserRole.faculty:
-          _idCtrl.text = 'faculty@simats.edu';
+          _idCtrl.text = 'abisha@simats.edu.in';
           break;
         case UserRole.securityAdmin:
         case UserRole.superAdmin:
