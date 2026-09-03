@@ -116,7 +116,7 @@ abstract final class SimatsTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: SimatsColors.primary,
           foregroundColor: SimatsColors.onPrimary,
-          minimumSize: const Size(double.infinity, SimatsSpacing.buttonHeight),
+          minimumSize: const Size(64, SimatsSpacing.buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(SimatsRadius.lg),
           ),
@@ -129,7 +129,7 @@ abstract final class SimatsTheme {
       OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: SimatsColors.primary,
-          minimumSize: const Size(double.infinity, SimatsSpacing.buttonHeight),
+          minimumSize: const Size(64, SimatsSpacing.buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(SimatsRadius.lg),
           ),
