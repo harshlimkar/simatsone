@@ -22,7 +22,7 @@ class BiometricAuthService {
 
   final LocalAuthentication _auth;
 
-  /// Check if hardware supports biometric and has enrolled biometrics
+  /// Check if hardware supports biometric
   Future<bool> isBiometricsAvailable() async {
     try {
       final canCheck = await _auth.canCheckBiometrics;
@@ -44,12 +44,12 @@ class BiometricAuthService {
     }
   }
 
-  /// Trigger native phone biometrics (Fingerprint / Face ID / Phone Screen Lock)
+  /// Trigger native phone biometrics (Fingerprint / Face ID / Screen Lock)
   Future<BiometricAuthStatus> authenticate({required String roleTitle}) async {
     try {
       final authenticated = await _auth.authenticate(
         localizedReason:
-            'Scan your fingerprint or face to sign in as $roleTitle',
+            'Scan fingerprint or verify screen lock to sign in as $roleTitle',
         biometricOnly: false,
         persistAcrossBackgrounding: true,
       );
@@ -57,13 +57,26 @@ class BiometricAuthService {
           ? BiometricAuthStatus.success
           : BiometricAuthStatus.canceled;
     } on PlatformException catch (e) {
-      debugPrint('Biometric PlatformException: code=${e.code}, msg=${e.message}');
-      if (e.code == 'NotAvailable' ||
-          e.code == 'NotEnrolled' ||
-          e.code == 'PasscodeNotSet') {
-        return BiometricAuthStatus.notEnrolled;
+      debugPrint('Biometric primary attempt PlatformException: ${e.code} - ${e.message}');
+      // Fallback attempt: biometricOnly = true for devices that reject device credentials
+      try {
+        final retryAuth = await _auth.authenticate(
+          localizedReason: 'Scan fingerprint to sign in as $roleTitle',
+          biometricOnly: true,
+          persistAcrossBackgrounding: true,
+        );
+        return retryAuth
+            ? BiometricAuthStatus.success
+            : BiometricAuthStatus.canceled;
+      } on PlatformException catch (e2) {
+        debugPrint('Biometric retry PlatformException: ${e2.code} - ${e2.message}');
+        if (e2.code == 'NotAvailable' ||
+            e2.code == 'NotEnrolled' ||
+            e2.code == 'PasscodeNotSet') {
+          return BiometricAuthStatus.notEnrolled;
+        }
+        return BiometricAuthStatus.failed;
       }
-      return BiometricAuthStatus.failed;
     } catch (e) {
       debugPrint('Biometric unexpected error: $e');
       return BiometricAuthStatus.failed;

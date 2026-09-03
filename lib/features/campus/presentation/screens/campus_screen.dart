@@ -27,6 +27,7 @@ class _CampusScreenState extends State<CampusScreen> {
     final launched = await MapsNavigationService.openGoogleMapsNavigation(
       destinationLat: loc.latitude,
       destinationLng: loc.longitude,
+      query: loc.query,
       destinationLabel: loc.name,
     );
 
