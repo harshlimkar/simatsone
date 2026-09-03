@@ -1,4 +1,4 @@
-﻿name: simats_one
+name: simats_one
 description: "SIMATS ONE - Smart Campus Suite. One Campus. One App. One Connected Experience."
 publish_to: "none"
 version: 1.0.0+1
@@ -60,9 +60,6 @@ dependencies:
 
   # Non-sensitive user preferences only
   shared_preferences: ^2.3.5
-
-  # Background Work
-  workmanager: ^0.5.2
 
 dev_dependencies:
   flutter_test:
