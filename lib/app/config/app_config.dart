@@ -4,46 +4,53 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 abstract final class AppConfig {
+  static String? _get(String key) {
+    if (!dotenv.isInitialized) return null;
+    try {
+      return dotenv.env[key];
+    } catch (_) {
+      return null;
+    }
+  }
+
   // ── Environment ─────────────────────────────────────────────────────────────
-  static String get environment => dotenv.env['ENVIRONMENT'] ?? 'development';
+  static String get environment => _get('ENVIRONMENT') ?? 'development';
   static bool get isDevelopment => environment == 'development';
   static bool get isProduction => environment == 'production';
 
   // ── API ─────────────────────────────────────────────────────────────────────
   static String get apiBaseUrl =>
-      dotenv.env['API_BASE_URL'] ?? 'https://api.simatsone.edu.in/api/v1';
+      _get('API_BASE_URL') ?? 'https://api.simatsone.edu.in/api/v1';
   static String get wsBaseUrl =>
-      dotenv.env['WS_BASE_URL'] ?? 'wss://api.simatsone.edu.in/ws';
+      _get('WS_BASE_URL') ?? 'wss://api.simatsone.edu.in/ws';
 
   // ── Attendance Thresholds ────────────────────────────────────────────────────
   static double get attendanceWarningThreshold =>
-      double.tryParse(dotenv.env['ATTENDANCE_WARNING_THRESHOLD'] ?? '85') ??
-      85.0;
+      double.tryParse(_get('ATTENDANCE_WARNING_THRESHOLD') ?? '85') ?? 85.0;
   static double get attendanceCriticalThreshold =>
-      double.tryParse(dotenv.env['ATTENDANCE_CRITICAL_THRESHOLD'] ?? '75') ??
-      75.0;
+      double.tryParse(_get('ATTENDANCE_CRITICAL_THRESHOLD') ?? '75') ?? 75.0;
 
   // ── Session ──────────────────────────────────────────────────────────────────
   static int get tokenExpiryBufferSeconds =>
-      int.tryParse(dotenv.env['TOKEN_EXPIRY_BUFFER_SECONDS'] ?? '60') ?? 60;
+      int.tryParse(_get('TOKEN_EXPIRY_BUFFER_SECONDS') ?? '60') ?? 60;
   static int get sessionTimeoutMinutes =>
-      int.tryParse(dotenv.env['SESSION_TIMEOUT_MINUTES'] ?? '480') ?? 480;
+      int.tryParse(_get('SESSION_TIMEOUT_MINUTES') ?? '480') ?? 480;
 
   // ── Feature Flags ────────────────────────────────────────────────────────────
   static bool get enableAnalytics =>
-      dotenv.env['ENABLE_ANALYTICS']?.toLowerCase() == 'true';
+      _get('ENABLE_ANALYTICS')?.toLowerCase() == 'true';
   static bool get enableRealTimeAlerts =>
-      dotenv.env['ENABLE_REAL_TIME_ALERTS']?.toLowerCase() != 'false';
+      _get('ENABLE_REAL_TIME_ALERTS')?.toLowerCase() != 'false';
   static bool get enableOfflineSync =>
-      dotenv.env['ENABLE_OFFLINE_SYNC']?.toLowerCase() != 'false';
+      _get('ENABLE_OFFLINE_SYNC')?.toLowerCase() != 'false';
   static bool get enableLibrary =>
-      dotenv.env['ENABLE_LIBRARY']?.toLowerCase() != 'false';
+      _get('ENABLE_LIBRARY')?.toLowerCase() != 'false';
   static bool get enableNavigation =>
-      dotenv.env['ENABLE_NAVIGATION']?.toLowerCase() != 'false';
+      _get('ENABLE_NAVIGATION')?.toLowerCase() != 'false';
 
   // ── Map Provider ─────────────────────────────────────────────────────────────
   static String get mapProvider =>
-      dotenv.env['MAP_PROVIDER'] ?? 'openstreetmap';
+      _get('MAP_PROVIDER') ?? 'openstreetmap';
 }
 
 /// Compile-time feature flags (can override at runtime for gradual rollout)

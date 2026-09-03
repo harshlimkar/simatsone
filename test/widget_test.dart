@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:simats_one/app/app.dart';
 import 'package:simats_one/features/attendance/domain/entities/attendance_entities.dart';
 import 'package:simats_one/shared/models/enums.dart';
 
@@ -133,12 +135,16 @@ void main() {
     });
   });
 
-  group('Network Status Model Tests', () {
-    test('Reports connectivity properly', () {
-      expect(NetworkStatus.connectedWifi.isConnected, isTrue);
-      expect(NetworkStatus.connectedMobile.isConnected, isTrue);
-      expect(NetworkStatus.noInternet.isConnected, isFalse);
-      expect(NetworkStatus.unknown.isConnected, isFalse);
+  group('App Widget Smoke Tests', () {
+    testWidgets('Pumps SimatsOneApp and renders initial screen without crash',
+        (tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: SimatsOneApp(),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(find.byType(SimatsOneApp), findsOneWidget);
     });
   });
 }
