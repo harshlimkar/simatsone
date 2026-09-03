@@ -92,22 +92,30 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 96,
-                      height: 96,
+                      width: 108,
+                      height: 108,
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: SimatsColors.onPrimary.withValues(alpha: 0.12),
+                        color: SimatsColors.surface,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: SimatsColors.onPrimary.withValues(alpha: 0.3),
-                          width: 2,
-                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
                       ),
-                      child: Center(
-                        child: Text(
-                          'S',
-                          style: SimatsTextStyles.displayLg.copyWith(
-                            color: SimatsColors.onPrimary,
-                            fontSize: 48,
+                      child: Image.asset(
+                        'assets/branding/simats_logo.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => Center(
+                          child: Text(
+                            'S',
+                            style: SimatsTextStyles.displayLg.copyWith(
+                              color: SimatsColors.primary,
+                              fontSize: 48,
+                            ),
                           ),
                         ),
                       ),

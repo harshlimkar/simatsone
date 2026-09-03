@@ -59,22 +59,27 @@ class SimatsAppBar extends ConsumerWidget implements PreferredSizeWidget {
           ),
           child: Row(
             children: [
-              // ── Brand Logo Icon ──────────────────────────────────────────
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: SimatsColors.primary,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Center(
-                  child: Text(
-                    'S',
-                    style: TextStyle(
-                      color: SimatsColors.onPrimary,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 18,
-                      fontFamily: 'Inter',
+              // ── Brand Logo Icon (Official SIMATS Engineering Emblem) ──────
+              Image.asset(
+                'assets/branding/simats_logo.png',
+                width: 36,
+                height: 36,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: SimatsColors.primary,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'S',
+                      style: TextStyle(
+                        color: SimatsColors.onPrimary,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                      ),
                     ),
                   ),
                 ),

@@ -296,31 +296,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   Widget _buildHeader() => Column(
         children: [
           Container(
-            width: 72,
-            height: 72,
+            width: 84,
+            height: 84,
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [SimatsColors.primary, Color(0xFF1E3A66)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: SimatsColors.surfaceContainerLowest,
               shape: BoxShape.circle,
+              border: Border.all(color: SimatsColors.outlineVariant, width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: SimatsColors.primary.withValues(alpha: 0.25),
-                  blurRadius: 10,
+                  color: SimatsColors.primary.withValues(alpha: 0.12),
+                  blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: const Center(
-              child: Text(
-                'S',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 34,
-                  fontWeight: FontWeight.w800,
-                  color: SimatsColors.onPrimary,
+            child: Image.asset(
+              'assets/branding/simats_logo.png',
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => const Center(
+                child: Text(
+                  'S',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 34,
+                    fontWeight: FontWeight.w800,
+                    color: SimatsColors.primary,
+                  ),
                 ),
               ),
             ),
@@ -329,29 +331,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           Text(AppConstants.appName, style: SimatsTextStyles.headlineLg),
           const SizedBox(height: 2),
           Text(
-            AppConstants.appTagline,
-            style: SimatsTextStyles.bodyMd.copyWith(
+            'Saveetha School of Engineering',
+            style: SimatsTextStyles.titleMedium.copyWith(
+              color: SimatsColors.primary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            'Engineer to Excel • AICTE | NAAC A++ | NIRF Ranked',
+            style: SimatsTextStyles.bodySm.copyWith(
               color: SimatsColors.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 3,
-            ),
-            decoration: BoxDecoration(
-              color: SimatsColors.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(9999),
-            ),
-            child: Text(
-              AppConstants.institutionAccreditation,
-              style: SimatsTextStyles.labelSm.copyWith(
-                color: SimatsColors.secondary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
           ),
         ],
       );
