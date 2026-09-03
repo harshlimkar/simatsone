@@ -16,16 +16,28 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _idCtrl = TextEditingController(text: 'student@simats.edu');
   final _passCtrl = TextEditingController(text: 'simats123');
   bool _obscure = true;
   UserRole _selectedRole = UserRole.student;
   bool _isAuthenticatingBiometrics = false;
+  late AnimationController _pulseCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
 
   @override
   void dispose() {
+    _pulseCtrl.dispose();
     _idCtrl.dispose();
     _passCtrl.dispose();
     super.dispose();
@@ -49,47 +61,85 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
   }
 
+  String _selectedRoleTitle() {
+    return switch (_selectedRole) {
+      UserRole.faculty => 'Faculty',
+      UserRole.securityAdmin || UserRole.superAdmin => 'Admin',
+      _ => 'Student',
+    };
+  }
+
   Future<void> _handleBiometricAuth() async {
     if (_isAuthenticatingBiometrics) return;
     setState(() => _isAuthenticatingBiometrics = true);
 
     final bioService = ref.read(biometricServiceProvider);
-    final isAvailable = await bioService.isBiometricsAvailable();
+    final roleName = _selectedRoleTitle();
 
-    String roleName = switch (_selectedRole) {
-      UserRole.faculty => 'Faculty',
-      UserRole.securityAdmin || UserRole.superAdmin => 'Security Admin',
-      _ => 'Student',
-    };
+    final status = await bioService.authenticate(roleTitle: roleName);
 
-    if (isAvailable) {
-      final success = await bioService.authenticate(roleTitle: roleName);
-      if (success) {
-        await ref.read(authProvider.notifier).loginWithBiometrics(_selectedRole);
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Biometric authentication canceled or not recognized.'),
-              backgroundColor: SimatsColors.primary,
-            ),
-          );
-        }
+    if (status == BiometricAuthStatus.success) {
+      await ref.read(authProvider.notifier).loginWithBiometrics(_selectedRole);
+    } else if (status == BiometricAuthStatus.notEnrolled) {
+      if (mounted) {
+        _showEnrollmentFallbackDialog(roleName);
       }
-    } else {
-      // Direct demo sign in if biometric hardware is unavailable
+    } else if (status == BiometricAuthStatus.canceled) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Biometric sensor not enrolled. Signing in as $roleName...'),
+          const SnackBar(
+            content: Text('Biometric authentication canceled.'),
             backgroundColor: SimatsColors.primary,
+            duration: Duration(seconds: 2),
           ),
         );
       }
-      await ref.read(authProvider.notifier).loginWithBiometrics(_selectedRole);
+    } else {
+      if (mounted) {
+        _showEnrollmentFallbackDialog(roleName);
+      }
     }
 
     if (mounted) setState(() => _isAuthenticatingBiometrics = false);
+  }
+
+  void _showEnrollmentFallbackDialog(String roleName) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: SimatsColors.surface,
+        title: Row(
+          children: [
+            const Icon(Icons.fingerprint_rounded, color: SimatsColors.secondary),
+            const SizedBox(width: 8),
+            Text('Biometric Authentication', style: SimatsTextStyles.headlineSm),
+          ],
+        ),
+        content: Text(
+          'Device biometrics not registered or currently unavailable. Would you like to use Quick Demo Sign-In as $roleName or enter your password?',
+          style: SimatsTextStyles.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Use Password'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await ref
+                  .read(authProvider.notifier)
+                  .loginWithBiometrics(_selectedRole);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SimatsColors.secondary,
+              foregroundColor: SimatsColors.onSecondary,
+            ),
+            child: Text('Quick Demo $roleName Sign In'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _submit() async {
@@ -120,6 +170,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final error = authState is AuthError ? authState.failure.message : null;
     ref.listen<AuthState>(authProvider, (_, next) => _navigate(next, context));
 
+    final roleTitle = _selectedRoleTitle();
+
     return Scaffold(
       backgroundColor: SimatsColors.surface,
       body: SafeArea(
@@ -132,19 +184,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: SimatsSpacing.spaceXl),
-                _buildHeader(),
                 const SizedBox(height: SimatsSpacing.spaceLg),
+                _buildHeader(),
+                const SizedBox(height: SimatsSpacing.spaceBase),
 
-                // ── 1. Role Selection Segment (Student / Faculty / Admin) ───────
+                // ── 1. Role Tabs Selector (Student / Faculty / Admin) ─────────
                 _buildRoleSelector(),
                 const SizedBox(height: SimatsSpacing.spaceBase),
 
-                // ── 2. Primary Biometric Fingerprint Action ─────────────────────
-                _buildBiometricCard(isLoading),
+                // ── 2. Prominent Biometric / Fingerprint Scanner Card ─────────
+                _buildBiometricCard(isLoading, roleTitle),
                 const SizedBox(height: SimatsSpacing.spaceBase),
 
-                // ── Divider with Or ──────────────────────────────────────────
+                // ── Divider ───────────────────────────────────────────────────
                 Row(
                   children: [
                     const Expanded(child: Divider()),
@@ -156,6 +208,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         'OR USE PASSWORD',
                         style: SimatsTextStyles.labelSm.copyWith(
                           color: SimatsColors.outline,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -172,7 +225,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
-                    labelText: 'ID / Institutional Email',
+                    labelText: 'Institutional Email / ID',
                     prefixIcon: Icon(Icons.badge_outlined, size: 20),
                   ),
                   validator: (v) => (v == null || v.trim().isEmpty)
@@ -226,7 +279,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               color: SimatsColors.primary,
                             ),
                           )
-                        : Text('Sign In with Password as ${_selectedRoleTitle()}'),
+                        : Text('Sign In with Password as $roleTitle'),
                   ),
                 ),
                 const SizedBox(height: SimatsSpacing.spaceXl),
@@ -240,38 +293,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  String _selectedRoleTitle() {
-    return switch (_selectedRole) {
-      UserRole.faculty => 'Faculty',
-      UserRole.securityAdmin || UserRole.superAdmin => 'Security Admin',
-      _ => 'Student',
-    };
-  }
-
   Widget _buildHeader() => Column(
         children: [
           Container(
-            width: 76,
-            height: 76,
-            decoration: const BoxDecoration(
-              color: SimatsColors.primary,
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [SimatsColors.primary, Color(0xFF1E3A66)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: SimatsColors.primary.withValues(alpha: 0.25),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: const Center(
               child: Text(
                 'S',
                 style: TextStyle(
                   fontFamily: 'Inter',
-                  fontSize: 36,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 34,
+                  fontWeight: FontWeight.w800,
                   color: SimatsColors.onPrimary,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: SimatsSpacing.spaceBase),
+          const SizedBox(height: SimatsSpacing.spaceSm),
           Text(AppConstants.appName, style: SimatsTextStyles.headlineLg),
-          const SizedBox(height: SimatsSpacing.space2xs),
+          const SizedBox(height: 2),
           Text(
             AppConstants.appTagline,
             style: SimatsTextStyles.bodyMd.copyWith(
@@ -279,11 +335,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: SimatsSpacing.spaceXs),
+          const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: SimatsSpacing.spaceSm,
-              vertical: SimatsSpacing.space2xs,
+              horizontal: 10,
+              vertical: 3,
             ),
             decoration: BoxDecoration(
               color: SimatsColors.surfaceContainerHigh,
@@ -293,7 +349,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               AppConstants.institutionAccreditation,
               style: SimatsTextStyles.labelSm.copyWith(
                 color: SimatsColors.secondary,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -305,7 +361,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Select Portal Role',
+          'Select Portal Account',
           style: SimatsTextStyles.labelLg.copyWith(
             color: SimatsColors.primary,
             fontWeight: FontWeight.w700,
@@ -347,17 +403,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Expanded(
       child: InkWell(
-        onTap: () {
-          _onRoleChanged(role);
-          // Optional: immediately trigger biometric on tap if desired
-        },
+        onTap: () => _onRoleChanged(role),
         borderRadius: BorderRadius.circular(SimatsRadius.md),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(
-            vertical: SimatsSpacing.spaceSm,
-            horizontal: 6,
-          ),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
           decoration: BoxDecoration(
             color: isSelected ? SimatsColors.primary : SimatsColors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(SimatsRadius.md),
@@ -381,7 +431,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Icon(
                 icon,
                 color: isSelected ? SimatsColors.onPrimary : SimatsColors.primary,
-                size: 24,
+                size: 22,
               ),
               const SizedBox(height: 4),
               Text(
@@ -390,8 +440,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   color: isSelected ? SimatsColors.onPrimary : SimatsColors.onSurface,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -400,20 +448,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildBiometricCard(bool isLoading) {
-    final roleTitle = _selectedRoleTitle();
-
+  Widget _buildBiometricCard(bool isLoading, String roleTitle) {
     return Container(
       padding: const EdgeInsets.all(SimatsSpacing.spaceBase),
       decoration: BoxDecoration(
         color: SimatsColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(SimatsRadius.lg),
-        border: Border.all(color: SimatsColors.secondary.withValues(alpha: 0.4), width: 1.5),
+        border: Border.all(
+          color: SimatsColors.secondary.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: SimatsColors.secondary.withValues(alpha: 0.08),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -421,20 +470,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         children: [
           Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: SimatsColors.secondary.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.fingerprint_rounded,
-                    color: SimatsColors.secondary,
-                    size: 28,
-                  ),
-                ),
+              // Pulsating fingerprint icon badge
+              AnimatedBuilder(
+                animation: _pulseCtrl,
+                builder: (_, child) {
+                  return Transform.scale(
+                    scale: 1.0 + (_pulseCtrl.value * 0.08),
+                    child: Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: SimatsColors.secondary.withValues(
+                          alpha: 0.12 + (_pulseCtrl.value * 0.08),
+                        ),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: SimatsColors.secondary.withValues(
+                            alpha: 0.3 + (_pulseCtrl.value * 0.3),
+                          ),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.fingerprint_rounded,
+                          color: SimatsColors.secondary,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
               const SizedBox(width: SimatsSpacing.spaceSm),
               Expanded(
@@ -442,15 +508,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Biometric & Fingerprint Login',
-                      style: SimatsTextStyles.titleMd.copyWith(
+                      'Phone Biometric / Fingerprint',
+                      style: SimatsTextStyles.titleMedium.copyWith(
                         fontWeight: FontWeight.w700,
                         color: SimatsColors.primary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Instant access to $roleTitle Portal using phone sensors',
+                      'Scan fingerprint or face to open $roleTitle Portal',
                       style: SimatsTextStyles.bodySm.copyWith(
                         color: SimatsColors.onSurfaceVariant,
                       ),
@@ -469,7 +535,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               icon: const Icon(Icons.fingerprint_rounded, size: 22),
               label: Text(
                 isLoading
-                    ? 'Verifying Biometrics...'
+                    ? 'Checking Sensors...'
                     : 'Scan Fingerprint as $roleTitle',
               ),
               style: ElevatedButton.styleFrom(
@@ -526,13 +592,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               color: SimatsColors.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: SimatsSpacing.space2xs),
+          const SizedBox(height: 2),
           Text(
             AppConstants.institutionAddress,
             style: SimatsTextStyles.bodySm,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: SimatsSpacing.space2xs),
+          const SizedBox(height: 2),
           Text(
             AppConstants.institutionPhone,
             style: SimatsTextStyles.labelSm.copyWith(color: SimatsColors.secondary),

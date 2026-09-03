@@ -55,6 +55,8 @@ abstract final class SimatsTextStyles {
     color: SimatsColors.primary,
   );
 
+  static const TextStyle titleMedium = titleMd;
+
   // ── Body ───────────────────────────────────────────────────────────────────
   static const TextStyle bodyLg = TextStyle(
     fontFamily: 'Inter',
@@ -73,6 +75,8 @@ abstract final class SimatsTextStyles {
     letterSpacing: 0,
     color: SimatsColors.onSurface,
   );
+
+  static const TextStyle bodyMedium = bodyMd;
 
   static const TextStyle bodySm = TextStyle(
     fontFamily: 'Inter',

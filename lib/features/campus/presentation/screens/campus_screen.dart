@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/simats_colors.dart';
 import '../../../../app/theme/simats_text_styles.dart';
 import '../../../../app/theme/simats_spacing.dart';
+import '../../../../core/services/maps_navigation_service.dart';
 import '../../../../shared/widgets/widgets.dart';
 
 class CampusScreen extends StatefulWidget {
@@ -14,68 +15,171 @@ class CampusScreen extends StatefulWidget {
 class _CampusScreenState extends State<CampusScreen> {
   final _searchCtrl = TextEditingController();
   String _query = '';
-
-  final _buildings = [
-    (
-      name: 'CSE Computing Block',
-      category: 'Academic & Laboratories',
-      floors: 'G + 4 Floors',
-      distance: '120m away',
-      eta: '2 min walk',
-      icon: Icons.computer_rounded,
-      rooms: ['Room 204', 'Turing Lab 1-4', 'AI Research Centre'],
-    ),
-    (
-      name: 'SAIL — Saveetha Academic Infotech Library',
-      category: 'Central Library & Digital Hub',
-      floors: 'G + 3 Floors',
-      distance: '250m away',
-      eta: '4 min walk',
-      icon: Icons.local_library_rounded,
-      rooms: ['Reading Hall A', 'Digital Resource Center', 'Quiet Study Quad'],
-    ),
-    (
-      name: 'Engineering Auditorium B',
-      category: 'Seminars & Conferences',
-      floors: 'Ground Floor',
-      distance: '340m away',
-      eta: '5 min walk',
-      icon: Icons.theater_comedy_rounded,
-      rooms: ['Auditorium Hall', 'Green Room', 'VIP Lounge'],
-    ),
-    (
-      name: 'Robotics & 5G Centre of Excellence',
-      category: 'Advanced R&D Innovation',
-      floors: 'Level 2, Tech Hub',
-      distance: '410m away',
-      eta: '6 min walk',
-      icon: Icons.smart_toy_rounded,
-      rooms: ['Robotics Arena', '5G Core Testing Rig', 'IoT Sensor Bank'],
-    ),
-    (
-      name: 'Administrative Avenue & Gate 1',
-      category: 'Campus Entry & Administration',
-      floors: 'Ground Complex',
-      distance: '500m away',
-      eta: '7 min walk',
-      icon: Icons.account_balance_rounded,
-      rooms: ['Dean Office', 'Admissions Desk', 'Controller of Examinations'],
-    ),
-    (
-      name: 'North Gate 3 Pedestrian Turnstiles',
-      category: 'Safe Detour Entry Point',
-      floors: 'Perimeter Access',
-      distance: '380m away',
-      eta: '5 min walk',
-      icon: Icons.door_sliding_rounded,
-      rooms: ['Security Post 03', 'Automated Biometric Turnstiles'],
-    ),
-  ];
+  final List<CampusLocation> _buildings = MapsNavigationService.locations;
 
   @override
   void dispose() {
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  void _navigateToLocation(CampusLocation loc) async {
+    final launched = await MapsNavigationService.openGoogleMapsNavigation(
+      destinationLat: loc.latitude,
+      destinationLng: loc.longitude,
+      destinationLabel: loc.name,
+    );
+
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Opening walking route to ${loc.name}...'),
+          backgroundColor: SimatsColors.primary,
+        ),
+      );
+    }
+  }
+
+  void _showLocationDetails(CampusLocation loc) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: SimatsColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(SimatsSpacing.spaceBase),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: SimatsColors.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: SimatsSpacing.spaceBase),
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: SimatsColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.map_rounded,
+                      color: SimatsColors.primary,
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(width: SimatsSpacing.spaceSm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          loc.name,
+                          style: SimatsTextStyles.headlineSm.copyWith(
+                            color: SimatsColors.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          loc.category,
+                          style: SimatsTextStyles.bodySm.copyWith(
+                            color: SimatsColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: SimatsSpacing.spaceBase),
+              Container(
+                padding: const EdgeInsets.all(SimatsSpacing.spaceSm),
+                decoration: BoxDecoration(
+                  color: SimatsColors.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(SimatsRadius.md),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _infoPill(Icons.directions_walk_rounded, loc.distance, 'Distance'),
+                    _infoPill(Icons.timer_outlined, loc.eta, 'Est. Time'),
+                    _infoPill(Icons.layers_outlined, loc.floors, 'Structure'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: SimatsSpacing.spaceBase),
+              Text(
+                'Key Labs & Facilities Inside',
+                style: SimatsTextStyles.titleMedium.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: SimatsSpacing.spaceXs),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: loc.rooms.map((r) {
+                  return Chip(
+                    label: Text(r, style: SimatsTextStyles.bodySm),
+                    backgroundColor: SimatsColors.surfaceContainerHigh,
+                    side: BorderSide.none,
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: SimatsSpacing.spaceXl),
+              SizedBox(
+                width: double.infinity,
+                height: SimatsSpacing.buttonHeight,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    _navigateToLocation(loc);
+                  },
+                  icon: const Icon(Icons.navigation_rounded, size: 20),
+                  label: const Text('Start Walking Navigation in Google Maps'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: SimatsColors.secondary,
+                    foregroundColor: SimatsColors.onSecondary,
+                    elevation: 2,
+                  ),
+                ),
+              ),
+              const SizedBox(height: SimatsSpacing.spaceSm),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _infoPill(IconData icon, String value, String label) {
+    return Column(
+      children: [
+        Icon(icon, size: 20, color: SimatsColors.secondary),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: SimatsTextStyles.labelMd.copyWith(fontWeight: FontWeight.w700),
+        ),
+        Text(
+          label,
+          style: SimatsTextStyles.labelSm.copyWith(color: SimatsColors.outline),
+        ),
+      ],
+    );
   }
 
   @override
@@ -91,14 +195,83 @@ class _CampusScreenState extends State<CampusScreen> {
     return Scaffold(
       backgroundColor: SimatsColors.surface,
       appBar: AppBar(
-        title: const Text('Campus Wayfinding & Navigation'),
+        title: const Text('Campus Wayfinding & Maps'),
         backgroundColor: SimatsColors.surface,
+        elevation: 0,
       ),
       body: Column(
         children: [
-          // Search & Filter header
+          // ── Google Maps Hero Header ─────────────────────────────────────────
+          Container(
+            margin: const EdgeInsets.symmetric(
+              horizontal: SimatsSpacing.marginMobile,
+              vertical: SimatsSpacing.spaceXs,
+            ),
+            padding: const EdgeInsets.all(SimatsSpacing.spaceBase),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [SimatsColors.primary, Color(0xFF162D50)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(SimatsRadius.lg),
+              boxShadow: [
+                BoxShadow(
+                  color: SimatsColors.primary.withValues(alpha: 0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: SimatsColors.onPrimary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.near_me_rounded,
+                      color: SimatsColors.onPrimary,
+                      size: 26,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: SimatsSpacing.spaceSm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Live Campus Navigation',
+                        style: SimatsTextStyles.titleMedium.copyWith(
+                          color: SimatsColors.onPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Turn-by-turn walking routes powered by Google Maps',
+                        style: SimatsTextStyles.bodySm.copyWith(
+                          color: SimatsColors.onPrimary.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Search & Filter bar ────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.all(SimatsSpacing.marginMobile),
+            padding: const EdgeInsets.symmetric(
+              horizontal: SimatsSpacing.marginMobile,
+              vertical: SimatsSpacing.spaceSm,
+            ),
             child: SimatsTextField(
               controller: _searchCtrl,
               hint: 'Search classroom, lab, auditorium or gate...',
@@ -107,7 +280,7 @@ class _CampusScreenState extends State<CampusScreen> {
             ),
           ),
 
-          // Buildings listing
+          // ── Locations list ────────────────────────────────────────────────
           Expanded(
             child: filtered.isEmpty
                 ? const SimatsEmptyState(
@@ -138,9 +311,9 @@ class _CampusScreenState extends State<CampusScreen> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF0B1C30).withOpacity(0.04),
-                              blurRadius: 3,
-                              offset: const Offset(0, 1),
+                              color: SimatsColors.primary.withValues(alpha: 0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
@@ -150,16 +323,16 @@ class _CampusScreenState extends State<CampusScreen> {
                             Row(
                               children: [
                                 Container(
-                                  width: 40,
-                                  height: 40,
+                                  width: 42,
+                                  height: 42,
                                   decoration: BoxDecoration(
                                     color: SimatsColors.surfaceContainer,
                                     borderRadius: BorderRadius.circular(
                                       SimatsSpacing.spaceSm,
                                     ),
                                   ),
-                                  child: Icon(
-                                    item.icon,
+                                  child: const Icon(
+                                    Icons.business_rounded,
                                     size: 22,
                                     color: SimatsColors.secondary,
                                   ),
@@ -172,7 +345,7 @@ class _CampusScreenState extends State<CampusScreen> {
                                     children: [
                                       Text(
                                         item.name,
-                                        style: SimatsTextStyles.titleMd
+                                        style: SimatsTextStyles.titleMedium
                                             .copyWith(
                                               fontWeight: FontWeight.w700,
                                               color: SimatsColors.primary,
@@ -222,28 +395,35 @@ class _CampusScreenState extends State<CampusScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: SimatsSpacing.spaceSm),
-                            Wrap(
-                              spacing: SimatsSpacing.spaceXs,
-                              runSpacing: SimatsSpacing.spaceXs,
-                              children: item.rooms.map((r) {
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: SimatsColors.surfaceContainerLow,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    r,
-                                    style: SimatsTextStyles.labelSm.copyWith(
-                                      color: SimatsColors.onSurfaceVariant,
+                            const SizedBox(height: SimatsSpacing.spaceBase),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => _showLocationDetails(item),
+                                    icon: const Icon(Icons.info_outline_rounded, size: 16),
+                                    label: const Text('Details & Rooms'),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 8),
+                                      side: const BorderSide(color: SimatsColors.outlineVariant),
                                     ),
                                   ),
-                                );
-                              }).toList(),
+                                ),
+                                const SizedBox(width: SimatsSpacing.spaceSm),
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () => _navigateToLocation(item),
+                                    icon: const Icon(Icons.navigation_rounded, size: 16),
+                                    label: const Text('Google Maps'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: SimatsColors.secondary,
+                                      foregroundColor: SimatsColors.onSecondary,
+                                      elevation: 1,
+                                      padding: const EdgeInsets.symmetric(vertical: 8),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

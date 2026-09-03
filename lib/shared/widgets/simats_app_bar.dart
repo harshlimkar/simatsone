@@ -1,6 +1,6 @@
 // SIMATS ONE – SimatsAppBar
-// Fixed app bar matching Stitch design:
-// Logo | App name + network status pill | Actions (notifications + avatar)
+// Fixed institutional app bar: Logo | Title + Subtitle | Actions (Notifications + Profile Avatar)
+// Built with strict constraints to eliminate RenderFlex overflow on any screen size.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +9,6 @@ import '../../app/theme/simats_text_styles.dart';
 import '../../app/theme/simats_spacing.dart';
 import '../../core/connectivity/network_monitor.dart';
 import '../../shared/models/enums.dart';
-import 'simats_network_badge.dart';
 
 class SimatsAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const SimatsAppBar({
@@ -42,155 +41,167 @@ class SimatsAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: SimatsColors.surface.withOpacity(0.95),
+        color: SimatsColors.surface,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0B1C30).withOpacity(0.04),
+            color: SimatsColors.primary.withValues(alpha: 0.05),
             blurRadius: 8,
-            offset: const Offset(0, 1),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: SafeArea(
         bottom: false,
-        child: SizedBox(
+        child: Container(
           height: SimatsSpacing.appBarHeight,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: SimatsSpacing.marginMobile,
-            ),
-            child: Row(
-              children: [
-                // ── Logo ───────────────────────────────────────────────────
-                Image.asset(
-                  'assets/branding/simats_logo.png',
-                  height: 32,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: SimatsColors.primaryContainer,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'S',
-                        style: TextStyle(
-                          color: SimatsColors.onPrimary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: SimatsSpacing.marginMobile,
+          ),
+          child: Row(
+            children: [
+              // ── Brand Logo Icon ──────────────────────────────────────────
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: SimatsColors.primary,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: Text(
+                    'S',
+                    style: TextStyle(
+                      color: SimatsColors.onPrimary,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 18,
+                      fontFamily: 'Inter',
                     ),
                   ),
                 ),
-                const SizedBox(width: SimatsSpacing.spaceSm),
+              ),
+              const SizedBox(width: SimatsSpacing.spaceSm),
 
-                // ── Title + Network Badge ──────────────────────────────────
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'SIMATS ONE',
-                            style: SimatsTextStyles.headlineSm.copyWith(
-                              color: SimatsColors.primary,
-                              letterSpacing: -0.2,
-                            ),
+              // ── Title + Subtitle (Overflow-Proof Column) ───────────────────
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'SIMATS ONE',
+                          style: SimatsTextStyles.titleMedium.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: SimatsColors.primary,
+                            letterSpacing: -0.2,
                           ),
-                          if (subtitle != null) ...[
-                            const SizedBox(width: SimatsSpacing.spaceXs),
-                            Text(
-                              '| $subtitle',
-                              style: SimatsTextStyles.labelSm,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ],
-                      ),
-                      if (showNetworkBadge) ...[
-                        const SizedBox(height: SimatsSpacing.space2xs),
-                        SimatsNetworkBadge(status: networkStatus),
-                      ],
-                    ],
-                  ),
-                ),
-
-                // ── Actions ────────────────────────────────────────────────
-                if (actions != null) ...actions!,
-
-                // ── Notification Bell ──────────────────────────────────────
-                SizedBox(
-                  width: SimatsSpacing.minTouchTarget,
-                  height: SimatsSpacing.minTouchTarget,
-                  child: Stack(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.notifications_outlined),
-                        color: SimatsColors.onSurface,
-                        onPressed: onNotificationsTap,
-                        tooltip: 'Notifications',
-                      ),
-                      if (notificationCount > 0)
-                        Positioned(
-                          right: 6,
-                          top: 6,
-                          child: Container(
-                            width: 16,
-                            height: 16,
-                            decoration: const BoxDecoration(
-                              color: SimatsColors.error,
+                        ),
+                        if (showNetworkBadge) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Text(
-                                notificationCount > 9
-                                    ? '9+'
-                                    : '$notificationCount',
-                                style: SimatsTextStyles.labelSm.copyWith(
-                                  color: SimatsColors.onError,
-                                  fontSize: 9,
-                                ),
-                              ),
+                              color: networkStatus.isConnected
+                                  ? SimatsColors.statusSuccess
+                                  : SimatsColors.statusWarning,
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                ),
-
-                // ── Profile Avatar ─────────────────────────────────────────
-                GestureDetector(
-                  onTap: onProfileTap,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: SimatsColors.surfaceContainer,
-                      border: Border.all(
-                        color: SimatsColors.outlineVariant,
-                        width: 1.5,
-                      ),
+                        ],
+                      ],
                     ),
-                    child: profileImageUrl != null
-                        ? ClipOval(
-                            child: Image.network(
-                              profileImageUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  const _DefaultAvatar(),
-                            ),
-                          )
-                        : const _DefaultAvatar(),
-                  ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 1),
+                      Text(
+                        subtitle!,
+                        style: SimatsTextStyles.labelSm.copyWith(
+                          color: SimatsColors.onSurfaceVariant,
+                          fontSize: 11,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
                 ),
-              ],
-            ),
+              ),
+
+              // ── Additional Actions ────────────────────────────────────────
+              if (actions != null) ...actions!,
+
+              // ── Notification Bell with Badge ──────────────────────────────
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.notifications_outlined, size: 22),
+                      color: SimatsColors.onSurface,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: onNotificationsTap,
+                      tooltip: 'Notifications',
+                    ),
+                    if (notificationCount > 0)
+                      Positioned(
+                        right: 4,
+                        top: 4,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: SimatsColors.error,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 14,
+                            minHeight: 14,
+                          ),
+                          child: Text(
+                            notificationCount > 9 ? '9+' : '$notificationCount',
+                            style: const TextStyle(
+                              color: SimatsColors.onError,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+
+              // ── Profile Avatar ────────────────────────────────────────────
+              GestureDetector(
+                onTap: onProfileTap,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: SimatsColors.surfaceContainerHigh,
+                    border: Border.all(
+                      color: SimatsColors.outlineVariant,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: profileImageUrl != null
+                      ? ClipOval(
+                          child: Image.network(
+                            profileImageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const _DefaultAvatar(),
+                          ),
+                        )
+                      : const _DefaultAvatar(),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -203,8 +214,8 @@ class _DefaultAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Icon(
-    Icons.person_rounded,
-    size: 20,
-    color: SimatsColors.onSurfaceVariant,
-  );
+        Icons.person_rounded,
+        size: 18,
+        color: SimatsColors.primary,
+      );
 }
