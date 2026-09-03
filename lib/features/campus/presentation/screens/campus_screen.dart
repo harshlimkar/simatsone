@@ -167,19 +167,24 @@ class _CampusScreenState extends State<CampusScreen> {
   }
 
   Widget _infoPill(IconData icon, String value, String label) {
-    return Column(
-      children: [
-        Icon(icon, size: 20, color: SimatsColors.secondary),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: SimatsTextStyles.labelMd.copyWith(fontWeight: FontWeight.w700),
-        ),
-        Text(
-          label,
-          style: SimatsTextStyles.labelSm.copyWith(color: SimatsColors.outline),
-        ),
-      ],
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, size: 20, color: SimatsColors.secondary),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: SimatsTextStyles.labelMd.copyWith(fontWeight: FontWeight.w700),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            label,
+            style: SimatsTextStyles.labelSm.copyWith(color: SimatsColors.outline),
+          ),
+        ],
+      ),
     );
   }
 
@@ -372,26 +377,34 @@ class _CampusScreenState extends State<CampusScreen> {
                                   color: SimatsColors.secondary,
                                 ),
                                 const SizedBox(width: 4),
-                                Text(
-                                  '${item.eta} (${item.distance})',
-                                  style: SimatsTextStyles.labelSm.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: SimatsColors.onSurface,
+                                Flexible(
+                                  child: Text(
+                                    '${item.eta} (${item.distance})',
+                                    style: SimatsTextStyles.labelSm.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: SimatsColors.onSurface,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                const SizedBox(width: SimatsSpacing.spaceSm),
+                                const SizedBox(width: SimatsSpacing.spaceXs),
                                 Text('•', style: SimatsTextStyles.labelSm),
-                                const SizedBox(width: SimatsSpacing.spaceSm),
+                                const SizedBox(width: SimatsSpacing.spaceXs),
                                 const Icon(
                                   Icons.layers_outlined,
                                   size: 16,
                                   color: SimatsColors.onSurfaceVariant,
                                 ),
                                 const SizedBox(width: 4),
-                                Text(
-                                  item.floors,
-                                  style: SimatsTextStyles.labelSm.copyWith(
-                                    color: SimatsColors.onSurfaceVariant,
+                                Flexible(
+                                  child: Text(
+                                    item.floors,
+                                    style: SimatsTextStyles.labelSm.copyWith(
+                                      color: SimatsColors.onSurfaceVariant,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
