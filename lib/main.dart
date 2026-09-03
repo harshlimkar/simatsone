@@ -9,8 +9,12 @@ import 'app/app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load environment configuration
-  await dotenv.load(fileName: '.env');
+  // Load environment configuration safely
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('SIMATS ONE: Note - using default config (.env: $e)');
+  }
 
   // Lock orientation to portrait for phone-optimized experience
   await SystemChrome.setPreferredOrientations([
