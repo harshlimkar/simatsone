@@ -1,109 +1,252 @@
-# SIMATS ONE — Smart Campus Suite
+# SIMATS ONE — Smart Campus Mobile Suite
 
-> **One Campus. One App. One Connected Experience.**
+[![Flutter](https://img.shields.io/badge/Flutter-3.44.0-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.12.0-0175C2?logo=dart&logoColor=white)](https://dart.dev)
+[![Riverpod](https://img.shields.io/badge/State_Management-Riverpod_2.6-blue)](https://riverpod.dev)
+[![GoRouter](https://img.shields.io/badge/Router-GoRouter_14-blueviolet)](https://pub.dev/packages/go_router)
+[![Biometrics](https://img.shields.io/badge/Security-Native_Biometrics_&_Fingerprint-success)](https://pub.dev/packages/local_auth)
+[![Google Maps](https://img.shields.io/badge/Navigation-Google_Maps_API-brightgreen?logo=googlemaps&logoColor=white)](https://developers.google.com/maps)
+[![License](https://img.shields.io/badge/License-Proprietary_SIMATS-red)]()
 
-**Institution:** SIMATS Engineering (Saveetha Institute of Medical and Technical Sciences), Saveetha Nagar, Thandalam, Chennai – 602105, Tamil Nadu, India.  
-**Accreditation:** AICTE Approved | NAAC A++ Accredited | NIRF Rank 46 (Govt. of India).  
-**Visual Source of Truth:** Google Stitch Project *"SIMATS ONE Smart Campus Suite"*.
-
----
-
-## 📱 Executive Overview
-
-**SIMATS ONE** is an enterprise-grade, offline-first smart campus mobile platform serving engineering students, faculty, and security administration across SIMATS Engineering. It is engineered with Flutter, Dart, Riverpod, GoRouter, and Material 3, translating official institutional workflows into an authoritative, high-density, touch-optimized user experience.
-
----
-
-## ✨ Features Implemented
-
-### 1. Flagship Student Dashboard (Stitch Screen `b5da04a18375479381c163943a106c56`)
-- **Biometric Identity Card**: Live verification status, student register number (`211001048`), academic year, and section.
-- **Biometric Attendance Hero**: Interactive circular SVG metric with aggregate percentage (`86.4%`), course breakdown summary, and examination eligibility indicators.
-- **6 Quick Portals Grid**: Instant shortcuts to Attendance, Timetable, SAIL Library, Wayfinding, Security SOS, and Hackathons.
-- **Dynamic Daily Schedule**: Real-time class status cards with remaining duration badges (`Live (42m left)`) and one-touch indoor navigation.
-- **Academic Notices Circular**: Verified Controller of Examinations announcements with official references (`COE/SIMATS/24/772`).
-
-### 2. Campus Security Alerts & Safety (Stitch Screen `77d31287f47e40a09f978834b4fb7c83`)
-- **High-Priority Critical Broadcast**: Real-time alerts with pulsing beacons, restricted zone warnings, and safe detour protocol recommendations (North Gate 3 turnstiles).
-- **Interactive Multi-Category Filtering**: Instant category chips for Emergency, Security, Weather, and Academic Advisories.
-- **Security Officer Command Center**: Administrative dashboard for issuing and broadcasting verified institutional directives campus-wide.
-
-### 3. Academic Attendance Module
-- Subject-by-subject percentage calculation (`present / total × 100`) handling zero-class safety.
-- Warning threshold notifications for courses dipping below the 85% requirement.
-- Interactive Faculty roster for continuous attendance recording and submission.
-
-### 4. Campus Wayfinding & Navigation
-- Indoor route calculation and estimated walking times across CSE Block, Turing Block, and Auditorium.
-- Accessible alternative routing bypasses during maintenance or restricted zones.
-
-### 5. SAIL — Saveetha Academic Infotech Library
-- Searchable catalog for physical engineering textbooks, IEEE journal volumes, and cloud e-books.
-- Real-time stack location (Floor, Section) and copy availability indicators.
-
-### 6. Centres of Excellence Discovery
-- Institutional discovery portal for SIMATS advanced initiatives: 5G & Wireless NextGen, Robotics & Automation, Cybersecurity & Forensics, Connected & Electric Vehicles (CEV), and iOS Technologies.
+> **One Campus. One App. One Connected Experience.**  
+> Designed & developed for **Saveetha Institute of Medical and Technical Sciences (SIMATS)**, Saveetha Nagar, Thandalam, Chennai – 602105, Tamil Nadu, India.  
+> **Accreditation:** AICTE Approved | NAAC A++ Accredited | NIRF Top Ranked Institution.  
+> **Design Source of Truth:** Google Stitch *"SIMATS ONE Smart Campus Suite"*.
 
 ---
 
-## 🛠 Technology Stack
+## 🏛️ Executive Summary
 
-- **Framework**: Flutter 3.44.0 (Channel stable)
-- **Language**: Dart 3.12.0
-- **State Management**: Flutter Riverpod 2.6
-- **Navigation & Deep Linking**: GoRouter 14
-- **HTTP Client**: Dio 5 with QueuedInterceptors (auto token refresh & secure logging)
-- **Local Persistence / Offline Cache**: Drift & SQLite
-- **Hardware Security**: `flutter_secure_storage` (backed by Android Keystore AES-256)
-- **Design Tokens**: Google Stitch Design System (Inter font, Corporate Navy `#00102D`, Royal Blue `#3755C3`)
+**SIMATS ONE** is an enterprise-grade, offline-first smart campus mobile platform serving engineering students, teaching faculty, and campus security command. Built on modern Flutter and clean architecture, SIMATS ONE bridges native device sensors (fingerprint/face biometrics, GPS, and hardware navigation) with high-density academic and security workflows.
+
+---
+
+## 🌟 Key Modules & Role Portals
+
+### 1. 🎓 Student Portal (`Harsh Limkar N` — B.Tech CSE, Year 3)
+- **Biometric Verified Identity Card**: Live badge, register number (`211001048`), academic year, and Section A tag.
+- **Biometric Attendance Hero**: Interactive circular SVG metric reflecting real-time aggregate percentage (`86.4%`), course breakdown summary, and exam eligibility status.
+- **6 Quick Portals Grid**: Shortcuts to Attendance Breakdown, Daily Timetable, SAIL Central Library, Wayfinding, Campus Safety SOS, and Hackathons.
+- **Dynamic Daily Schedule**: Real-time classes with remaining countdown badges (`Live (42m left)`) and 1-tap Google Maps classroom navigation.
+- **Academic Circulars**: Verified notices issued by the Controller of Examinations with official reference IDs (`COE/SIMATS/24/772`).
+
+---
+
+### 2. 👩‍🏫 Faculty Portal (`Ms. Abisha` — Asst. Professor, Dept. of CSE)
+- **Faculty Identity & Cabin Info**: Employee ID `SIMATS-FAC-2041`, Tech Block Cabin 312, and verified biometric check-in status.
+- **Key Faculty Metrics**:
+  - 👥 **Students Taught**: `184` across Sections CS3A, CS3B, and AI-DS
+  - ⏱️ **Weekly Workload**: `18h / 22h` completed (92%)
+  - 📋 **Pending Evaluations**: `14` lab records and assignments
+  - 🏖️ **Leave Balance**: `12 Days` (Casual, Academic & OD)
+- **Live Teaching Session**: Real-time card for `CS304 • Mobile Computing` with live attendance progress (`58/64, 90.6%`) and direct turn-by-turn navigation to Room 204.
+- **Interactive Class Attendance Roster**:
+  - Live search filter by student name or roll number (`CS-01` to `CS-08`).
+  - One-tap **"All Present"** batch action.
+  - Interactive Present/Absent toggle chips.
+  - Cloud synchronization with Saveetha SIS server.
+- **Faculty Portals (6-Grid)**: Mark Attendance, Weekly Timetable, Internal Gradebook, Turing Lab Allocation, Research Grants Hub, and Classroom Notice Broadcast.
+- **Research & Grants**: SEC Seed Research Grant (₹2.4 Lakh funded), 4 Scopus papers in 2024, and 100% NBA/NAAC readiness.
+
+---
+
+### 3. 🛡️ Campus Security & Command Center (`Officer V. Rajan`)
+- **Emergency Broadcast Center**: Administrative incident console for issuing immediate campus alerts.
+- **Detour Routing & Access Management**: Turnstile control and pedestrian rerouting to North Gate 3 during maintenance or security incidents.
+- **Priority Categorization**: Emergency (Red), Security (Orange), Weather (Yellow), and Academic Advisories (Blue).
+
+---
+
+## 🔐 Native Device Biometric & Fingerprint Authentication
+
+SIMATS ONE leverages Android's native `BiometricPrompt` framework to provide one-touch biometric authentication across all three portal accounts:
+
+```
+                  ┌─────────────────────────────────────┐
+                  │          Login Screen UI            │
+                  │  [ Student ] [ Faculty ] [ Admin ]  │
+                  └──────────────────┬──────────────────┘
+                                     │
+                                     ▼
+                    ┌─────────────────────────────────┐
+                    │      BiometricAuthService       │
+                    │   (local_auth + dual attempt)   │
+                    └────────────────┬────────────────┘
+                                     │
+                                     ▼
+          ┌────────────────────────────────────────────────────────┐
+          │               Android Native Biometrics                │
+          │  • MainActivity extends FlutterFragmentActivity        │
+          │  • Theme.AppCompat.Light.NoActionBar (styles.xml)      │
+          │  • Permissions: USE_BIOMETRIC + USE_FINGERPRINT        │
+          └──────────────────────────┬─────────────────────────────┘
+                                     │
+                    ┌────────────────┴────────────────┐
+                    │                                 │
+           Fingerprint Valid                  Hardware Missing
+                    │                                 │
+                    ▼                                 ▼
+      Direct Dashboard Access              Quick Demo Sign-In Fallback
+```
+
+### Technical Platform Setup:
+1. **FragmentActivity Architecture**: `MainActivity.kt` inherits from `FlutterFragmentActivity` (required by Android androidx biometric APIs).
+2. **AppCompat Theme**: In `android/app/src/main/res/values/styles.xml`, `NormalTheme` inherits from `Theme.AppCompat.Light.NoActionBar`, preventing Android's `IllegalStateException`.
+3. **Hardware Permissions**: Configured in `AndroidManifest.xml`:
+   ```xml
+   <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+   <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+   ```
+4. **Dual-Attempt Fallback**: `BiometricAuthService` attempts standard authentication with device credential fallback, gracefully falling back to hardware-direct mode if credentials are restricted.
+
+---
+
+## 🗺️ Google Maps Walking & Campus Navigation
+
+SIMATS ONE provides deep Google Maps integration with **100% verified, real-world coordinates** for Saveetha Engineering College (SIMATS):
+
+| Campus Landmark | Coordinates | Address & Verified Google Place |
+| :--- | :--- | :--- |
+| **Saveetha Engineering College (Main Block)** | `13.02685° N, 80.01686° E` | Saveetha Nagar, NH48 Highway, Thandalam, Chennai – 602105 |
+| **SAIL Central Library & Digital Hub** | `13.02720° N, 80.01730° E` | Academic Complex, Saveetha Engineering College, Thandalam |
+| **Saveetha Convention Centre & Auditorium** | `13.02610° N, 80.01620° E` | Convention Plaza, Saveetha Nagar, Thandalam, Chennai |
+| **Saveetha Medical College & Hospital** | `12.99120° N, 80.05450° E` | Bangalore High Road, Saveetha Nagar, Thandalam – 602105 |
+| **Saveetha Dental College & Hospitals** | `13.04890° N, 80.14950° E` | 162, Poonamallee High Road, Velappanchavadi, Chennai – 600077 |
+| **Main Campus Gate 1 & Checkpost** | `13.02550° N, 80.01550° E` | NH48 Highway Entrance, Saveetha Nagar, Thandalam |
+| **Indoor Stadium & Sports Pavilion** | `13.02800° N, 80.01800° E` | Sports Pavilion, Saveetha Nagar, Thandalam |
+
+### Intent & Launch Architecture:
+- Android intent query registered in `AndroidManifest.xml`:
+  ```xml
+  <queries>
+      <intent>
+          <action android:name="android.intent.action.VIEW"/>
+          <data android:scheme="geo"/>
+      </intent>
+      <package android:name="com.google.android.apps.maps"/>
+  </queries>
+  ```
+- When tapping **"Google Maps"**, the app launches `geo:lat,lng?q=VerifiedPlaceQuery`, opening the verified Google Maps card with real-time walking routes from the user's current GPS position.
+
+---
+
+## 🎨 UI & Design Architecture
+
+- **Visual Framework**: Material 3 customized with the official **Google Stitch** institutional design tokens.
+- **Institutional Palette**:
+  - Primary Navy: `#00102D`
+  - Secondary Gold / Amber: `#D4A017` & `#3755C3`
+  - Surface Background: Clean off-white `#F8F9FC`
+- **Zero RenderFlex Overflows**: All rows, sync indicators, and status pills are wrapped in `Expanded` and `Flexible` with `TextOverflow.ellipsis`, guaranteed to render without pixel overflow across all device viewports (from 320px to tablet sizes).
+- **Clean Display**: Development watermark disabled (`debugShowCheckedModeBanner: false`) for an uncluttered presentation.
+
+---
+
+## 📂 Project Structure
+
+```text
+simatsone/
+├── android/
+│   ├── app/src/main/
+│   │   ├── AndroidManifest.xml           # Biometric & Google Maps queries
+│   │   ├── kotlin/.../MainActivity.kt    # FlutterFragmentActivity
+│   │   └── res/values/styles.xml         # Theme.AppCompat configuration
+├── lib/
+│   ├── app/
+│   │   ├── app.dart                      # Root MaterialApp (debug banner disabled)
+│   │   ├── config/app_config.dart        # Environment & institutional config
+│   │   ├── router/app_router.dart        # GoRouter navigation & route guards
+│   │   └── theme/                        # Colors, typography, spacing & themes
+│   ├── core/
+│   │   ├── auth/
+│   │   │   └── biometric_auth_service.dart # LocalAuth biometric service
+│   │   ├── connectivity/                 # Network status monitor
+│   │   ├── errors/                       # Failures & exceptions
+│   │   ├── network/                      # Dio HTTP client & interceptors
+│   │   ├── services/
+│   │   │   └── maps_navigation_service.dart # Google Maps navigation service
+│   │   ├── storage/                      # Secure storage & SQLite cache
+│   │   └── sync/                         # Offline-first sync engine
+│   ├── features/
+│   │   ├── alerts/                       # Security alerts & broadcast creation
+│   │   ├── attendance/                   # Biometric attendance tracking
+│   │   ├── auth/                         # Multi-role login & biometric prompt
+│   │   ├── campus/                       # Campus wayfinding & Google Maps UI
+│   │   ├── dashboard/                    # Student, Faculty & Admin dashboards
+│   │   ├── library/                      # SAIL digital library catalog
+│   │   ├── notifications/                # Institutional notifications
+│   │   ├── profile/                      # User profile & credentials
+│   │   └── research/                     # Centres of Excellence discovery
+│   └── shared/                           # Reusable Stitch widgets
+├── test/
+│   └── widget_test.dart                  # Automated unit and widget tests
+├── pubspec.yaml                          # Dependencies & asset manifests
+└── README.md                             # Project documentation
+```
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Flutter SDK `^3.44.0`
-- Dart SDK `^3.12.0`
-- Android SDK 34+
+- **Flutter SDK**: `^3.44.0`
+- **Dart SDK**: `^3.12.0`
+- **Android SDK**: 34+
+- **Physical Device or Emulator** with Android 9.0+ (Pie or newer)
 
-### Installation & Run
+### Installation
 
-1. Clone or navigate to the repository:
+1. **Clone the repository**:
    ```bash
+   git clone https://github.com/harshlimkar/simatsone.git
    cd simatsone
    ```
 
-2. Configure environment:
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Install dependencies:
+2. **Install dependencies**:
    ```bash
    flutter pub get
    ```
 
-4. Run unit and widget test suite:
+3. **Verify static analysis**:
+   ```bash
+   flutter analyze
+   ```
+   *(Expected: `No issues found!`)*
+
+4. **Run automated test suite**:
    ```bash
    flutter test
    ```
+   *(Expected: `All tests passed!`)*
 
-5. Run on an Android device or emulator:
+5. **Build & Run on Connected Device**:
    ```bash
    flutter run
    ```
 
 ---
 
-## 🧪 Testing
+## 🧪 Testing & Verification
 
-The repository contains automated unit and widget test suites covering:
-- Attendance percentage calculations (zero-safety, 85% warning threshold, 75% critical threshold).
-- Network status state-machine and connectivity detection.
-- Authentication session persistence and secure token lifecycles.
-- Security alert filtering and priority broadcast sorting.
+The repository includes comprehensive automated test coverage:
+- **Attendance Percentage Engine**: Unit tests validating threshold checks (<85% warning, <75% critical) and zero-division safety.
+- **Biometric Authentication Lifecycle**: Mock repository session persistence and token lifecycle tests.
+- **Widget Smoke Tests**: Complete application pump and layout verification.
 
-Run all tests:
+Run all tests with coverage:
 ```bash
 flutter test --coverage
 ```
+
+Build the release APK:
+```bash
+flutter build apk --release
+```
+
+---
+
+## 👨‍💻 Author & Repository
+
+- **Repository**: [github.com/harshlimkar/simatsone](https://github.com/harshlimkar/simatsone)
+- **Developer**: Harsh Limkar (`harsh.limkar@simats.edu.in`)
+- **Institution**: Saveetha Institute of Medical and Technical Sciences (SIMATS), Chennai, India.
