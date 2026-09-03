@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:simats_one/app/app.dart';
 import 'package:simats_one/features/attendance/domain/entities/attendance_entities.dart';
-import 'package:simats_one/shared/models/enums.dart';
 
 void main() {
   group('Attendance Calculation Unit Tests', () {
